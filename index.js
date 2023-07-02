@@ -16,6 +16,7 @@ const { ObjectId } = require('mongodb');
 require('dotenv').config()
 const PORT = process.env.PORT || 4000;
 const BASE_URL = process.env.BASE_URL;
+const MONGO_URL = process.env.MONGO_URL;
 
 let isLoggedIn = false;
 
@@ -27,7 +28,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use('/uploads', express.static(__dirname + '/uploads'));
 
-mongoose.connect('mongodb+srv://sudhesh:9lm0O9kPcNVjptAy@cluster0.jv3k8cb.mongodb.net/?retryWrites=true&w=majority');
+mongoose.connect(`${MONGO_URL}`);
 
 app.post('/register', async (req,res)=>{
   const {firstName, lastName, dateOfBirth, username, password} = req.body;
