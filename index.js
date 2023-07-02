@@ -42,7 +42,9 @@ app.post('/register', async (req,res)=>{
 
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
+  console.log("username, password ", username, password )
   const userDoc = await User.findOne({ username });
+  console.log("userDoc--->",userDoc)
   const result = bcrypt.compareSync(password, userDoc.password);
   if (result) {
     isLoggedIn = true;
