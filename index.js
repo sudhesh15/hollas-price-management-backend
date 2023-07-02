@@ -17,7 +17,6 @@ require('dotenv').config()
 const PORT = process.env.PORT || 4000;
 const BASE_URL = process.env.BASE_URL;
 const MONGO_URL = process.env.MONGO_URL;
-const axios = require('axios');
 
 let isLoggedIn = false;
 
@@ -43,7 +42,6 @@ app.post('/register', async (req,res)=>{
 
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
-  console.log("username, password", username, password)
   const userDoc = await User.findOne({ username });
   const result = bcrypt.compareSync(password, userDoc.password);
   if (result) {
@@ -62,10 +60,12 @@ app.post('/login', async (req, res) => {
 
 app.get('/profile', (req,res) => {
   const {token} = req.cookies;
-  jwt.verify(token, secret, {}, (err,info) => {
+  if(token){
+    jwt.verify(token, secret, {}, (err,info) => {
     if (err) throw err;
     res.json(info);
   });
+  }
 });
 
 app.post('/logout', (req,res)=>{
