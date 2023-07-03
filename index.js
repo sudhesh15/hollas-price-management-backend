@@ -21,7 +21,6 @@ const MONGO_URL = process.env.MONGO_URL;
 const salt = bcrypt.genSaltSync(10);
 const secret = "aszxde12we0dsjm3";
 
-
 app.use(cors({credentials:true, origin: `${BASE_URL}`}));
 app.use(express.json());
 app.use(cookieParser());
@@ -44,14 +43,15 @@ app.post('/login', async (req, res) => {
   const userDoc = await User.findOne({ username });
   const result = bcrypt.compareSync(password, userDoc.password);
   if (result) {
-    jwt.sign({ username, id: userDoc._id }, secret, {}, (err, token) => {
+    jwt.sign({ username, id: userDoc._id }, secret, { expiresIn: '1h' }, (err, token) => {
       if (err) throw err;
+      const expiresIn = 3600;
       res.cookie('token', token).json({
         id: userDoc._id,
         username,
+        expiresIn,
       });
-      console.log("token===>", token);
-    });
+    });    
   } else {
     res.status(400).json('wrong credentials');
   }
