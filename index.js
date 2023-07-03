@@ -21,8 +21,6 @@ const MONGO_URL = process.env.MONGO_URL;
 const salt = bcrypt.genSaltSync(10);
 const secret = "a1eg6WAa09ECXsdim6rfw2";
 
-const store = require('store')
-
 app.use(cors({credentials:true, origin: `${BASE_URL}`}));
 app.use(express.json());
 app.use(cookieParser());
@@ -52,8 +50,9 @@ app.post('/login', async (req, res) => {
         username,
       });
       console.log("token===>", token);
-      store.set('token', { token:token }) 
-      console.log("token1==>", store.get('token').token);
+      req.session.token = token;
+      console.log("req.session.token===>", req.session.token)
+
     });
   } else {
     res.status(400).json('wrong credentials');
