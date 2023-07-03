@@ -49,6 +49,8 @@ app.post('/login', async (req, res) => {
         id: userDoc._id,
         username,
       });
+      console.log("token===>", token)
+      sessionStorage.setItem('token', token);
     });
   } else {
     res.status(400).json('wrong credentials');
