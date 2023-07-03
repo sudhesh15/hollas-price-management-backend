@@ -77,38 +77,42 @@ app.post('/logout', (req,res)=>{
 
 app.post('/post', upload.single('file'), async (req,res) => {
   const {token} = req.cookies;
-  jwt.verify(token, secret, {}, async (err,info) => {
-    if (err) throw err;
-    const {productName,productCode,productMrp,productNlc,productHtcBp,brandName,categoryName} = req.body;
-    const postDoc = await Post.create({
-      productName,
-      productCode,
-      productMrp,
-      productNlc,
-      productHtcBp,
-      brandName,
-      categoryName,
-      author:info.id,
+  if(token){
+    jwt.verify(token, secret, {}, async (err,info) => {
+      if (err) throw err;
+      const {productName,productCode,productMrp,productNlc,productHtcBp,brandName,categoryName} = req.body;
+      const postDoc = await Post.create({
+        productName,
+        productCode,
+        productMrp,
+        productNlc,
+        productHtcBp,
+        brandName,
+        categoryName,
+        author:info.id,
+      });
+      res.json(postDoc);
     });
-    res.json(postDoc);
-  });
+  }
 });
 
 app.put('/post', upload.single('file'), async (req,res) => {
   const {token} = req.cookies;
-  jwt.verify(token, secret, {}, async (err,info) => {
-    if (err) throw err;
-    await Post.findByIdAndUpdate(req.body.id, {
-      productName : req.body.productName,
-      productCode : req.body.productCode,
-      productMrp : req.body.productMrp,
-      productNlc : req.body.productNlc,
-      productHtcBp : req.body.productHtcBp,
-      brandName : req.body.brandName,
-      categoryName : req.body.categoryName,
+  if(token){
+    jwt.verify(token, secret, {}, async (err,info) => {
+      if (err) throw err;
+      await Post.findByIdAndUpdate(req.body.id, {
+        productName : req.body.productName,
+        productCode : req.body.productCode,
+        productMrp : req.body.productMrp,
+        productNlc : req.body.productNlc,
+        productHtcBp : req.body.productHtcBp,
+        brandName : req.body.brandName,
+        categoryName : req.body.categoryName,
+      });
+      displayAlertMessage(res, 'Product updated successfully!');
     });
-    displayAlertMessage(res, 'Product updated successfully!');
-  });
+  }
 });
 
 function displayAlertMessage(res, message) {
@@ -183,44 +187,48 @@ app.get('/brand/:brand', async (req, res) => {
 
 app.post('/createBrand', upload.single('file'), async (req, res) => {
   const { token } = req.cookies;
-  jwt.verify(token, secret, {}, async (err, info) => {
-    if (err) {
-      console.error(err);
-      return res.status(401).json({ error: 'Invalid token' });
-    }
-    try {
-      const { brandName } = req.body;
-      const postDoc = await Brand.create({
-        brandName,
-        author: info.id,
-      });
-      res.json(postDoc);
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: 'Failed to create brand' });
-    }
-  });
+  if(token){
+    jwt.verify(token, secret, {}, async (err, info) => {
+      if (err) {
+        console.error(err);
+        return res.status(401).json({ error: 'Invalid token' });
+      }
+      try {
+        const { brandName } = req.body;
+        const postDoc = await Brand.create({
+          brandName,
+          author: info.id,
+        });
+        res.json(postDoc);
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to create brand' });
+      }
+    });
+  }
 });
 
 app.post('/createCategory', upload.single('file'), async (req, res) => {
   const { token } = req.cookies;
-  jwt.verify(token, secret, {}, async (err, info) => {
-    if (err) {
-      console.error(err);
-      return res.status(401).json({ error: 'Invalid token' });
-    }
-    try {
-      const { categoryName } = req.body;
-      const postDoc = await Category.create({
-        categoryName,
-        author: info.id,
-      });
-      res.json(postDoc);
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: 'Failed to create category' });
-    }
-  });
+  if(token){
+    jwt.verify(token, secret, {}, async (err, info) => {
+      if (err) {
+        console.error(err);
+        return res.status(401).json({ error: 'Invalid token' });
+      }
+      try {
+        const { categoryName } = req.body;
+        const postDoc = await Category.create({
+          categoryName,
+          author: info.id,
+        });
+        res.json(postDoc);
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to create category' });
+      }
+    });
+  }
 });
 
 
