@@ -58,8 +58,6 @@ app.post('/login', async (req, res) => {
         username,
       });
       console.log("token===>", token);
-      req.session.token = token;
-      console.log("req.session.token===>", req.session.token)
     });
   } else {
     res.status(400).json('wrong credentials');
