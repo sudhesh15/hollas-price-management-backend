@@ -49,20 +49,25 @@ app.post('/login', async (req, res) => {
         id: userDoc._id,
         username,
       });
-      req.session.token = token;
     });
   } else {
-    res.status(400).json('wrong credentials');
+    res.status(400).json('Wrong credentials');
   }
 });
 
-app.get('/profile', (req,res) => {
-  const {token} = req.cookies;
-  if(token){
-    jwt.verify(token, secret, {}, (err,info) => {
-    if (err) throw err;
-    res.json(info);
-  });
+app.get('/profile', (req, res) => {
+  const { token } = req.cookies;
+  if (token) {
+    jwt.verify(token, secret, {}, (err, info) => {
+      if (err) {
+        res.clearCookie('token');
+        res.status(401).json('Invalid token');
+      } else {
+        res.json(info);
+      }
+    });
+  } else {
+    res.status(401).json('Token not found');
   }
 });
 
