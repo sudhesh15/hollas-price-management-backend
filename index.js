@@ -49,10 +49,10 @@ app.post('/login', async (req, res) => {
         id: userDoc._id,
         username,
       });
-      console.log("token===>", token)
-      console.log("token1===>", sessionStorage.setItem('token', token))
-      sessionStorage.setItem('token', token);
-      console.log("token2==>", sessionStorage.getItem('token'));
+      console.log("token===>", token);
+      console.log("token1===>", localStorage.setItem('token', token));
+      localStorage.setItem('token', token);
+      console.log("token2==>", localStorage.getItem('token'));
     });
   } else {
     res.status(400).json('wrong credentials');
