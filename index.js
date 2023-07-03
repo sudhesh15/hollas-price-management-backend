@@ -60,7 +60,6 @@ app.post('/login', async (req, res) => {
       console.log("token===>", token);
       req.session.token = token;
       console.log("req.session.token===>", req.session.token)
-
     });
   } else {
     res.status(400).json('wrong credentials');
@@ -69,9 +68,11 @@ app.post('/login', async (req, res) => {
 
 app.get('/profile', (req, res) => {
   const { token } = req.cookies;
+  console.log("Received token:", token); // Log the received token
   if (token) {
     jwt.verify(token, secret, {}, (err, info) => {
       if (err) {
+        console.error('Token verification error:', err); // Log the error for troubleshooting
         res.clearCookie('token');
         res.status(401).json('Invalid token');
       } else {
