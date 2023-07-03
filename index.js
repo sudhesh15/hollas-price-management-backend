@@ -18,8 +18,6 @@ const PORT = process.env.PORT || 4000;
 const BASE_URL = process.env.BASE_URL;
 const MONGO_URL = process.env.MONGO_URL;
 
-let isLoggedIn = false;
-
 const salt = bcrypt.genSaltSync(10);
 const secret = "a1eg6WAa09ECXsdim6rfw2";
 
@@ -42,15 +40,11 @@ app.post('/register', async (req,res)=>{
 
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
-  console.log("username, password ", username, password )
   const userDoc = await User.findOne({ username });
-  console.log("userDoc--->",userDoc)
   const result = bcrypt.compareSync(password, userDoc.password);
   if (result) {
-    isLoggedIn = true;
     jwt.sign({ username, id: userDoc._id }, secret, {}, (err, token) => {
       if (err) throw err;
-      req.session.token = token;
       res.cookie('token', token).json({
         id: userDoc._id,
         username,
@@ -78,7 +72,6 @@ app.get('/profile', (req, res) => {
 });
 
 app.post('/logout', (req,res)=>{
-  isLoggedIn = false;
   res.cookie('token','').json('ok');
 });
 
@@ -143,35 +136,29 @@ app.delete('/deleteProduct/:id', async (req, res) => {
 });
 
 app.get('/getProductOnBrandAndCategory', async (req,res) => {
-  if(isLoggedIn){
-    res.json(
-      await Post.find()
-        .populate('productName')
-        .sort({brandName: 1})
-    );
-  }
+  res.json(
+    await Post.find()
+      .populate('productName')
+      .sort({brandName: 1})
+  );
 });
 
 app.get('/category', async (req,res) => {
-  if(isLoggedIn){
-    res.json(
-      await Category.find()
-        .populate('categoryName')
-        .sort({categoryName: 1})
-        .limit(100)
-    );
-  }
+  res.json(
+    await Category.find()
+      .populate('categoryName')
+      .sort({categoryName: 1})
+      .limit(100)
+  );
 });
 
 app.get('/brand', async (req,res) => {
-  if(isLoggedIn){
-    res.json(
-      await Brand.find()
-        .populate('brandName')
-        .sort({brandName: 1})
-        .limit(100)
-    );
-  }
+  res.json(
+    await Brand.find()
+      .populate('brandName')
+      .sort({brandName: 1})
+      .limit(100)
+  );
 });
 
 app.get('/product/:id', async (req, res) => {
@@ -181,21 +168,17 @@ app.get('/product/:id', async (req, res) => {
 });
 
 app.get('/category/:category', async (req, res) => {
-  if(isLoggedIn){
-    const {category} = req.params;
-    let categoryName = category;
-    const getPostOnCategory = await Post.find({categoryName}).sort({brandName: 1});
-    res.json(getPostOnCategory);
-  }
+  const {category} = req.params;
+  let categoryName = category;
+  const getPostOnCategory = await Post.find({categoryName}).sort({brandName: 1});
+  res.json(getPostOnCategory);
 });
 
 app.get('/brand/:brand', async (req, res) => {
-  if(isLoggedIn){
-    const {brand} = req.params;
-    let brandName = brand;
-    const getPostOnBrand = await Post.find({brandName}).sort({categoryName: 1});
-    res.json(getPostOnBrand);
-  }
+  const {brand} = req.params;
+  let brandName = brand;
+  const getPostOnBrand = await Post.find({brandName}).sort({categoryName: 1});
+  res.json(getPostOnBrand);
 });
 
 app.post('/createBrand', upload.single('file'), async (req, res) => {
