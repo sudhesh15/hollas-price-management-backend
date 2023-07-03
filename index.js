@@ -74,8 +74,9 @@ app.get('/profile', (req, res) => {
   }
 });
 
-app.post('/logout', (req,res)=>{
-  res.cookie('token','').json('ok');
+app.post('/logout', (req, res) => {
+  res.clearCookie('token');
+  res.status(200).json('Logged out successfully');
 });
 
 app.post('/post', upload.single('file'), async (req,res) => {
