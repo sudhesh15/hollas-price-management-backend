@@ -57,6 +57,27 @@ app.post('/login', async (req, res) => {
   }
 });
 
+app.post('/refreshToken', (req, res) => {
+  const { token } = req.cookies;
+  if (token) {
+    jwt.verify(token, secret, {}, (err, info) => {
+      if (err) {
+        console.error('Token verification error:', err);
+        res.clearCookie('token');
+        res.status(401).json('Invalid token');
+      } else {
+        const { username, id } = info;
+        jwt.sign({ username, id }, secret, { expiresIn: '1h' }, (err, newToken) => {
+          if (err) throw err;
+          res.cookie('token', newToken).json(newToken);
+        });
+      }
+    });
+  } else {
+    res.status(401).json('Token not found');
+  }
+});
+
 app.get('/profile', (req, res) => {
   const { token } = req.cookies;
   console.log("Received token:", token); // Log the received token
