@@ -43,38 +43,16 @@ app.post('/login', async (req, res) => {
   const userDoc = await User.findOne({ username });
   const result = bcrypt.compareSync(password, userDoc.password);
   if (result) {
-    jwt.sign({ username, id: userDoc._id }, secret, { expiresIn: '1h' }, (err, token) => {
+    jwt.sign({ username, id: userDoc._id }, secret, {}, (err, token) => {
       if (err) throw err;
-      const expiresIn = 3600;
-      res.cookie('token', token).json({
+      res.cookie('token', token, { httpOnly: true }).json({
         id: userDoc._id,
         username,
-        expiresIn,
       });
-    });    
-  } else {
-    res.status(400).json('wrong credentials');
-  }
-});
-
-app.post('/refreshToken', (req, res) => {
-  const { token } = req.cookies;
-  if (token) {
-    jwt.verify(token, secret, {}, (err, info) => {
-      if (err) {
-        console.error('Token verification error:', err);
-        res.clearCookie('token');
-        res.status(401).json('Invalid token');
-      } else {
-        const { username, id } = info;
-        jwt.sign({ username, id }, secret, { expiresIn: '1h' }, (err, newToken) => {
-          if (err) throw err;
-          res.cookie('token', newToken).json(newToken);
-        });
-      }
+      console.log("token===>", token);
     });
   } else {
-    res.status(401).json('Token not found');
+    res.status(400).json('wrong credentials');
   }
 });
 
