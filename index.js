@@ -21,6 +21,12 @@ const MONGO_URL = process.env.MONGO_URL;
 const salt = bcrypt.genSaltSync(10);
 const secret = "a1eg6WAa09ECXsdim6rfw2";
 
+app.use(session({
+  secret: secret,
+  resave: false,
+  saveUninitialized: true
+}));
+
 app.use(cors({credentials:true, origin: `${BASE_URL}`}));
 app.use(express.json());
 app.use(cookieParser());
