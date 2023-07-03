@@ -19,7 +19,7 @@ const BASE_URL = process.env.BASE_URL;
 const MONGO_URL = process.env.MONGO_URL;
 
 const salt = bcrypt.genSaltSync(10);
-const secret = "a1eg6WAa09ECXsdim6rfw2";
+const secret = "aszxde12we0dsjm3";
 
 
 app.use(cors({credentials:true, origin: `${BASE_URL}`}));
