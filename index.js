@@ -51,6 +51,7 @@ app.post('/login', async (req, res) => {
       });
       console.log("token===>", token)
       sessionStorage.setItem('token', token);
+      console.log("token1==>", sessionStorage.getItem('token'));
     });
   } else {
     res.status(400).json('wrong credentials');
