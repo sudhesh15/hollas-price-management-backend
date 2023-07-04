@@ -57,7 +57,8 @@ app.post('/login', async (req, res) => {
 });
 
 app.get('/check_login_status', (req, res) => {
-  const token = req.cookies.token; // Assuming you are using cookies to store the token
+  const token = req.cookies.token;
+  console.log("check_login_status token", token)
   if (!token) {
     return res.json({}); // No token, not logged in
   }
