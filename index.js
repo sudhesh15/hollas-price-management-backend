@@ -60,16 +60,20 @@ app.post('/login', async (req, res) => {
 });
 
 app.get('/check_login_status', (req, res) => {
-  if (isLoggedIn) {
+  let token = req.cookies.token;
+  console.log("check_login_status token", token)
+  if (!token) {
     return res.json({}); // No token, not logged in
   }
-
-  jwt.verify(token, secret, (err, decoded) => {
-    if (err) {
-      return res.json({}); // Token invalid, not logged in
-    }
-    return res.json({ username: decoded.username, id: decoded.id }); // Token valid, logged in
-  });
+  if(token){
+    jwt.verify(token, secret, (err, decoded) => {
+      if (err) {
+        return res.json({}); // Token invalid, not logged in
+      }
+      return res.json({ username: decoded.username, id: decoded.id }); // Token valid, logged in
+    });
+  }
+  
 });
 
 app.get('/profile', (req, res) => {
