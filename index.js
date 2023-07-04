@@ -28,6 +28,8 @@ app.use('/uploads', express.static(__dirname + '/uploads'));
 
 mongoose.connect(`${MONGO_URL}`);
 
+let isLoggedIn = false;
+
 app.post('/register', async (req,res)=>{
   const {firstName, lastName, dateOfBirth, username, password} = req.body;
   try{
@@ -49,6 +51,7 @@ app.post('/login', async (req, res) => {
         id: userDoc._id,
         username,
       });
+      isLoggedIn = true;
       console.log("token===>", token);
     });
   } else {
@@ -57,9 +60,7 @@ app.post('/login', async (req, res) => {
 });
 
 app.get('/check_login_status', (req, res) => {
-  const token = req.cookies.token;
-  console.log("check_login_status token", token)
-  if (!token) {
+  if (isLoggedIn) {
     return res.json({}); // No token, not logged in
   }
 
@@ -90,6 +91,7 @@ app.get('/profile', (req, res) => {
 });
 
 app.post('/logout', (req, res) => {
+  isLoggedIn = false;
   res.clearCookie('token');
   res.status(200).json('Logged out successfully');
 });
