@@ -56,16 +56,6 @@ app.post('/login', async (req, res) => {
   }
 });
 
-app.get('/check-login', (req, res) => {
-  if (req.session.userId) {
-    // User is logged in
-    res.sendStatus(200);
-  } else {
-    // User is not logged in
-    res.sendStatus(401);
-  }
-});
-
 app.get('/profile', (req, res) => {
   const { token } = req.cookies;
   console.log("Received token:", token); // Log the received token
