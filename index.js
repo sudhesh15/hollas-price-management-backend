@@ -17,6 +17,11 @@ require('dotenv').config()
 const PORT = process.env.PORT || 4000;
 const BASE_URL = process.env.BASE_URL;
 const MONGO_URL = process.env.MONGO_URL;
+const { v4: uuidv4 } = require('uuid');
+
+function generateUniqueSessionId() {
+  return uuidv4();
+}
 
 const salt = bcrypt.genSaltSync(10);
 const secret = "aszxde12we0dsjm3";
@@ -45,35 +50,19 @@ app.post('/login', async (req, res) => {
   const userDoc = await User.findOne({ username });
   const result = bcrypt.compareSync(password, userDoc.password);
   if (result) {
-    jwt.sign({ username, id: userDoc._id }, secret, {}, (err, token) => {
-      if (err) throw err;
-      res.cookie('token', token, { httpOnly: true }).json({
-        id: userDoc._id,
-        username,
-      });
-      isLoggedIn = true;
-      console.log("token===>", token);
-    });
-  } else {
-    res.status(400).json('wrong credentials');
-  }
-});
+    // Create a session for the logged-in user
+    const sessionId = generateUniqueSessionId(); // Generate a unique session ID
+    sessions[sessionId] = userDoc._id; // Store the user ID in the session
 
-app.get('/check_login_status', (req, res) => {
-  let token = req.cookies.token;
-  console.log("check_login_status token", token)
-  if (!token) {
-    return res.json({}); // No token, not logged in
-  }
-  if(token){
-    jwt.verify(token, secret, (err, decoded) => {
-      if (err) {
-        return res.json({}); // Token invalid, not logged in
-      }
-      return res.json({ username: decoded.username, id: decoded.id }); // Token valid, logged in
+    // Set the session ID as a cookie
+    res.cookie('sessionId', sessionId, { httpOnly: true }).json({
+      id: userDoc._id,
+      username,
     });
+    isLoggedIn = true;
+  } else {
+    res.status(400).json('Wrong credentials');
   }
-  
 });
 
 app.get('/profile', (req, res) => {
@@ -95,8 +84,13 @@ app.get('/profile', (req, res) => {
 });
 
 app.post('/logout', (req, res) => {
+  const { sessionId } = req.cookies;
+  if (sessionId) {
+    // Clear the session from the server
+    delete sessions[sessionId];
+  }
   isLoggedIn = false;
-  res.clearCookie('token');
+  res.clearCookie('sessionId');
   res.status(200).json('Logged out successfully');
 });
 
