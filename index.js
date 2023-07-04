@@ -74,7 +74,7 @@ app.post('/logout', (req, res) => {
   res.status(200).json('Logged out successfully');
 });
 
-app.post('/post', upload.single('file'), async (req,res) => {
+app.post('/post', async (req,res) => {
   if(isLoggedIn){
     const {productName,productCode,productMrp,productNlc,productHtcBp,brandName,categoryName} = req.body;
     const postDoc = await Post.create({
