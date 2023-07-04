@@ -85,7 +85,6 @@ app.post('/post', upload.single('file'), async (req,res) => {
       productHtcBp,
       brandName,
       categoryName,
-      author:info.id,
     });
     res.json(postDoc);
   }
@@ -191,12 +190,12 @@ app.get('/brand/:brand', async (req, res) => {
 });
 
 app.post('/createBrand', upload.single('file'), async (req, res) => {
+  console.log("isLoggedIn==>", isLoggedIn)
   if(isLoggedIn){
     try {
       const { brandName } = req.body;
       const postDoc = await Brand.create({
         brandName,
-        author: info.id,
       });
       res.json(postDoc);
     } catch (error) {
@@ -212,7 +211,6 @@ app.post('/createCategory', upload.single('file'), async (req, res) => {
       const { categoryName } = req.body;
       const postDoc = await Category.create({
         categoryName,
-        author: info.id,
       });
       res.json(postDoc);
     } catch (error) {
