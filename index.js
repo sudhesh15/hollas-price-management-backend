@@ -19,9 +19,13 @@ const BASE_URL = process.env.BASE_URL;
 const MONGO_URL = process.env.MONGO_URL;
 const { v4: uuidv4 } = require('uuid');
 
-function generateUniqueSessionId() {
-  return uuidv4();
-}
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', 'https://hollas-price-portal.netlify.app');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  next();
+});
 
 const salt = bcrypt.genSaltSync(10);
 const secret = "aszxde12we0dsjm3";
@@ -34,14 +38,6 @@ app.use('/uploads', express.static(__dirname + '/uploads'));
 mongoose.connect(`${MONGO_URL}`);
 
 let isLoggedIn = false;
-
-app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', 'https://hollas-price-portal.netlify.app');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-  next();
-});
 
 app.post('/register', async (req,res)=>{
   const {firstName, lastName, dateOfBirth, username, password} = req.body;
@@ -58,18 +54,17 @@ app.post('/login', async (req, res) => {
   const userDoc = await User.findOne({ username });
   const result = bcrypt.compareSync(password, userDoc.password);
   if (result) {
-    // Create a session for the logged-in user
-    const sessionId = generateUniqueSessionId(); // Generate a unique session ID
-    sessions[sessionId] = userDoc._id; // Store the user ID in the session
-
-    // Set the session ID as a cookie
-    res.cookie('sessionId', sessionId, { httpOnly: true }).json({
-      id: userDoc._id,
-      username,
+    jwt.sign({ username, id: userDoc._id }, secret, {}, (err, token) => {
+      if (err) throw err;
+      res.cookie('token', token, { httpOnly: true }).json({
+        id: userDoc._id,
+        username,
+      });
+      isLoggedIn = true;
+      console.log("token===>", token);
     });
-    isLoggedIn = true;
   } else {
-    res.status(400).json('Wrong credentials');
+    res.status(400).json('wrong credentials');
   }
 });
 
@@ -92,13 +87,8 @@ app.get('/profile', (req, res) => {
 });
 
 app.post('/logout', (req, res) => {
-  const { sessionId } = req.cookies;
-  if (sessionId) {
-    // Clear the session from the server
-    delete sessions[sessionId];
-  }
   isLoggedIn = false;
-  res.clearCookie('sessionId');
+  res.clearCookie('token');
   res.status(200).json('Logged out successfully');
 });
 
