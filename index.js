@@ -17,7 +17,9 @@ require('dotenv').config()
 const PORT = process.env.PORT || 4000;
 const BASE_URL = process.env.BASE_URL;
 const MONGO_URL = process.env.MONGO_URL;
-const { v4: uuidv4 } = require('uuid');
+const store = require('store2');
+
+console.log("isLoggedIn in localstorage ===>", store.get(isLoggedIn))
 
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', 'https://hollas-price-portal.netlify.app');
