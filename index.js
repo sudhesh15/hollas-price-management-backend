@@ -39,7 +39,7 @@ app.use('/uploads', express.static(__dirname + '/uploads'));
 
 mongoose.connect(`${MONGO_URL}`);
 
-let isLoggedIn = false;
+let ifLoggedIn = false;
 
 app.post('/register', async (req,res)=>{
   const {firstName, lastName, dateOfBirth, username, password} = req.body;
@@ -62,7 +62,7 @@ app.post('/login', async (req, res) => {
         id: userDoc._id,
         username,
       });
-      isLoggedIn = true;
+      ifLoggedIn = true;
       console.log("token===>", token);
     });
   } else {
@@ -71,13 +71,13 @@ app.post('/login', async (req, res) => {
 });
 
 app.post('/logout', (req, res) => {
-  isLoggedIn = false;
+  ifLoggedIn = false;
   res.clearCookie('token');
   res.status(200).json('Logged out successfully');
 });
 
 app.post('/post', async (req,res) => {
-  if(isLoggedIn){
+  if(ifLoggedIn){
     const {productName,productCode,productMrp,productNlc,productHtcBp,brandName,categoryName} = req.body;
     const postDoc = await Post.create({
       productName,
@@ -93,7 +93,7 @@ app.post('/post', async (req,res) => {
 });
 
 app.put('/post', upload.single('file'), async (req,res) => {
-  if(isLoggedIn){
+  if(ifLoggedIn){
     await Post.findByIdAndUpdate(req.body.id, {
       productName : req.body.productName,
       productCode : req.body.productCode,
@@ -117,7 +117,7 @@ function displayAlertMessage(res, message) {
 }
 
 app.delete('/deleteProduct/:id', async (req, res) => {
-  if(isLoggedIn){
+  if(ifLoggedIn){
     const productId = req.params.id;
     try {
       const result = await Post.deleteOne({ _id: new ObjectId(productId) });
@@ -134,7 +134,7 @@ app.delete('/deleteProduct/:id', async (req, res) => {
 });
 
 app.get('/getProductOnBrandAndCategory', async (req,res) => {
-  if(isLoggedIn){
+  if(ifLoggedIn){
     res.json(
       await Post.find()
         .populate('productName')
@@ -144,7 +144,7 @@ app.get('/getProductOnBrandAndCategory', async (req,res) => {
 });
 
 app.get('/category', async (req,res) => {
-  if(isLoggedIn){
+  if(ifLoggedIn){
     res.json(
       await Category.find()
         .populate('categoryName')
@@ -155,7 +155,7 @@ app.get('/category', async (req,res) => {
 });
 
 app.get('/brand', async (req,res) => {
-  if(isLoggedIn){
+  if(ifLoggedIn){
     res.json(
       await Brand.find()
         .populate('brandName')
@@ -166,7 +166,7 @@ app.get('/brand', async (req,res) => {
 });
 
 app.get('/product/:id', async (req, res) => {
-  if(isLoggedIn){
+  if(ifLoggedIn){
     const {id} = req.params;
     const postDoc = await Post.findById(id).populate('categoryName');
     res.json(postDoc);
@@ -174,7 +174,7 @@ app.get('/product/:id', async (req, res) => {
 });
 
 app.get('/category/:category', async (req, res) => {
-  if(isLoggedIn){
+  if(ifLoggedIn){
     const {category} = req.params;
     let categoryName = category;
     const getPostOnCategory = await Post.find({categoryName}).sort({brandName: 1});
@@ -183,7 +183,7 @@ app.get('/category/:category', async (req, res) => {
 });
 
 app.get('/brand/:brand', async (req, res) => {
-  if(isLoggedIn){
+  if(ifLoggedIn){
     const {brand} = req.params;
     let brandName = brand;
     const getPostOnBrand = await Post.find({brandName}).sort({categoryName: 1});
@@ -192,8 +192,8 @@ app.get('/brand/:brand', async (req, res) => {
 });
 
 app.post('/createBrand', upload.single('file'), async (req, res) => {
-  console.log("isLoggedIn==>", isLoggedIn)
-  if(isLoggedIn){
+  console.log("ifLoggedIn==>", ifLoggedIn)
+  if(ifLoggedIn){
     try {
       const { brandName } = req.body;
       const postDoc = await Brand.create({
@@ -208,7 +208,7 @@ app.post('/createBrand', upload.single('file'), async (req, res) => {
 });
 
 app.post('/createCategory', upload.single('file'), async (req, res) => {
-  if(isLoggedIn){
+  if(ifLoggedIn){
     try {
       const { categoryName } = req.body;
       const postDoc = await Category.create({
