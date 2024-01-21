@@ -159,6 +159,4 @@ app.post('/createCategory', upload.single('file'), async (req, res) => {
   } 
 });
 
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
+app.listen(PORT);
